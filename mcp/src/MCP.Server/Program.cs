@@ -13,6 +13,7 @@ using MCP.Server.Features.ConsultarEvaluaciones;
 using MCP.Server.Features.ConsultarCargaAcademica;
 using MCP.Server.Features.RegistrarEstudiante;
 using MCP.Server.Features.ActualizarEstudiante;
+using MCP.Server.Features.EliminarEstudiante;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,7 @@ builder.Services.AddScoped<ConsultarEvaluacionesService>();
 builder.Services.AddScoped<ConsultarCargaAcademicaService>();
 builder.Services.AddScoped<RegistrarEstudianteService>();
 builder.Services.AddScoped<ActualizarEstudianteService>();
+builder.Services.AddScoped<EliminarEstudianteService>();
 
 builder.Services
     .AddMcpServer()
@@ -52,7 +54,8 @@ builder.Services
     .WithTools<ConsultarEvaluacionesTool>()
     .WithTools<ConsultarCargaAcademicaTool>()
     .WithTools<RegistrarEstudianteTool>()
-    .WithTools<ActualizarEstudianteTool>();
+    .WithTools<ActualizarEstudianteTool>()
+    .WithTools<EliminarEstudianteTool>();
     
 builder.Services.AddScoped<
     IHistorialAcademicoRepository,
