@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Agent/Agent.csproj" />
+    <Project Path="src/MCP.Server/MCP.Server.csproj" />
+  </Folder>
+</Solution>
