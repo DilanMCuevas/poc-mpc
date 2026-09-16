@@ -9,6 +9,7 @@ using MCP.Server.Features.ConsultarProfesor;
 using MCP.Server.Features.ConsultarMateria;
 using MCP.Server.Features.ConsultarGrupo;
 using MCP.Server.Features.ConsultarHorarioEstudiante;
+using MCP.Server.Features.ConsultarEvaluaciones;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddScoped<ConsultarProfesorService>();
 builder.Services.AddScoped<ConsultarMateriaService>();
 builder.Services.AddScoped<ConsultarGrupoService>();
 builder.Services.AddScoped<ConsultarHorarioEstudianteService>();
+builder.Services.AddScoped<ConsultarEvaluacionesService>();
 
 builder.Services
     .AddMcpServer()
@@ -40,11 +42,14 @@ builder.Services
     .WithTools<ConsultarProfesorTool>()
     .WithTools<ConsultarMateriaTool>()
     .WithTools<ConsultarGrupoTool>()
-    .WithTools<ConsultarHorarioEstudianteTool>();
+    .WithTools<ConsultarHorarioEstudianteTool>()
+    .WithTools<ConsultarEvaluacionesTool>();
     
 builder.Services.AddScoped<
     IHistorialAcademicoRepository,
     HistorialAcademicoRepository>();
+
+builder.Services.AddScoped<IEvaluacionesRepository, EvaluacionesRepository>();
     
 
 
