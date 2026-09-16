@@ -7,6 +7,7 @@ using MCP.Server.Features.ConsultarHistorial;
 using MCP.Server.Features.ConsultarExpediente;
 using MCP.Server.Features.ConsultarProfesor;
 using MCP.Server.Features.ConsultarMateria;
+using MCP.Server.Features.ConsultarGrupo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,7 @@ builder.Services.AddScoped<ConsultarHistorialService>();
 builder.Services.AddScoped<ConsultarExpedienteService>();
 builder.Services.AddScoped<ConsultarProfesorService>();
 builder.Services.AddScoped<ConsultarMateriaService>();
+builder.Services.AddScoped<ConsultarGrupoService>();
 
 builder.Services
     .AddMcpServer()
@@ -34,7 +36,8 @@ builder.Services
     .WithTools<ConsultarHistorialTool>()
     .WithTools<ConsultarExpedienteTool>()
     .WithTools<ConsultarProfesorTool>()
-    .WithTools<ConsultarMateriaTool>();
+    .WithTools<ConsultarMateriaTool>()
+    .WithTools<ConsultarGrupoTool>();
     
 builder.Services.AddScoped<
     IHistorialAcademicoRepository,
