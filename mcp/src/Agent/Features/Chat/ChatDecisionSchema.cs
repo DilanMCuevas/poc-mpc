@@ -11,6 +11,8 @@ public static class ChatDecisionSchema
         var alternatives = new JsonArray();
         foreach (var tool in tools)
         {
+            // Deep copy preserves required, nullable type arrays and composition branches.
+            // Never replace the property's schema with a single inferred type.
             var arguments = JsonNode.Parse(tool.InputSchema.GetRawText())!.AsObject();
             // Only parameters advertised by MCP may be generated.
             arguments["additionalProperties"] = false;

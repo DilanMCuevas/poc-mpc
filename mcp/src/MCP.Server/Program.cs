@@ -12,6 +12,7 @@ using MCP.Server.Features.ConsultarHorarioEstudiante;
 using MCP.Server.Features.ConsultarEvaluaciones;
 using MCP.Server.Features.ConsultarCargaAcademica;
 using MCP.Server.Features.RegistrarEstudiante;
+using MCP.Server.Features.ActualizarEstudiante;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,7 @@ builder.Services.AddScoped<ConsultarHorarioEstudianteService>();
 builder.Services.AddScoped<ConsultarEvaluacionesService>();
 builder.Services.AddScoped<ConsultarCargaAcademicaService>();
 builder.Services.AddScoped<RegistrarEstudianteService>();
+builder.Services.AddScoped<ActualizarEstudianteService>();
 
 builder.Services
     .AddMcpServer()
@@ -49,7 +51,8 @@ builder.Services
     .WithTools<ConsultarHorarioEstudianteTool>()
     .WithTools<ConsultarEvaluacionesTool>()
     .WithTools<ConsultarCargaAcademicaTool>()
-    .WithTools<RegistrarEstudianteTool>();
+    .WithTools<RegistrarEstudianteTool>()
+    .WithTools<ActualizarEstudianteTool>();
     
 builder.Services.AddScoped<
     IHistorialAcademicoRepository,

@@ -7,8 +7,6 @@ namespace Agent.Features.Chat;
 
 public static class ToolArgumentValidator
 {
-    // The current MCP schemas contain flat string/integer parameters.
-    // Unknown types fail closed instead of silently bypassing validation.
     public static IReadOnlyList<string> Validate(
         McpToolInfo tool, JsonElement arguments, string userMessage)
     {
@@ -29,10 +27,8 @@ public static class ToolArgumentValidator
             foreach (var parameter in required.EnumerateArray())
             {
                 var name = parameter.GetString()!;
-                if (!arguments.TryGetProperty(name, out var value)
-                    || value.ValueKind == JsonValueKind.Null
-                    || (value.ValueKind == JsonValueKind.String
-                        && string.IsNullOrWhiteSpace(value.GetString())))
+                // Required constrains presence; the property's schema determines nullability.
+                if (!arguments.TryGetProperty(name, out _))
                 {
                     var description = properties.TryGetProperty(name, out var definition)
                         && definition.TryGetProperty("description", out var text)
@@ -57,34 +53,47 @@ public static class ToolArgumentValidator
                 continue;
             }
 
-            var type = definition.TryGetProperty("type", out var typeValue)
-                && typeValue.ValueKind == JsonValueKind.String ? typeValue.GetString() : null;
-            var validType = type switch
+            if (!ArgumentSchemaMatcher.Matches(argument.Value, definition, schema))
             {
-                "string" => argument.Value.ValueKind == JsonValueKind.String
-                    && !string.IsNullOrWhiteSpace(argument.Value.GetString()),
-                "integer" => argument.Value.ValueKind == JsonValueKind.Number
-                    && argument.Value.TryGetInt32(out _),
-                _ => false
-            };
-
-            if (!validType)
-            {
-                errors.Add($"El dato {argument.Name} debe tener el tipo {type ?? "declarado"} válido.");
+                errors.Add($"El dato {argument.Name} no cumple el esquema de tipos y restricciones declarado.");
                 continue;
             }
 
-            var literal = type == "string" ? argument.Value.GetString()!
-                : argument.Value.GetInt32().ToString(CultureInfo.InvariantCulture);
-            // Require a literal supplied by the user: no guessed IDs, defaults or example values.
-            var pattern = @"(?<![\p{L}\p{N}_-])" + Regex.Escape(literal) + @"(?![\p{L}\p{N}_-])";
-            if (!Regex.IsMatch(userMessage, pattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant,
-                    TimeSpan.FromMilliseconds(100)))
+            if (!ContainsUserValues(argument.Value, userMessage))
             {
                 errors.Add($"Indica explícitamente el dato {argument.Name} en tu solicitud.");
             }
         }
 
+        if (errors.Count == 0 && !ArgumentSchemaMatcher.Matches(arguments, schema, schema))
+        {
+            errors.Add("Los argumentos no cumplen las restricciones del esquema MCP.");
+        }
+
         return errors;
+    }
+
+    private static bool ContainsUserValues(JsonElement value, string userMessage)
+    {
+        // Null is accepted only after schema validation, never coerced to a string or default.
+        if (value.ValueKind == JsonValueKind.Null) return true;
+        if (value.ValueKind == JsonValueKind.Array)
+            return value.EnumerateArray().All(item => ContainsUserValues(item, userMessage));
+        if (value.ValueKind == JsonValueKind.Object)
+            return value.EnumerateObject().All(item => ContainsUserValues(item.Value, userMessage));
+
+        var literal = value.ValueKind switch
+        {
+            JsonValueKind.String => value.GetString()!,
+            JsonValueKind.Number when value.TryGetDecimal(out var number) =>
+                number.ToString("G29", CultureInfo.InvariantCulture),
+            _ => value.GetRawText()
+        };
+        if (string.IsNullOrWhiteSpace(literal)) return false;
+
+        // Preserve the existing evidence check without depending on how 'type' is encoded.
+        var pattern = @"(?<![\p{L}\p{N}_-])" + Regex.Escape(literal) + @"(?![\p{L}\p{N}_-])";
+        return Regex.IsMatch(userMessage, pattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant,
+            TimeSpan.FromMilliseconds(100));
     }
 }

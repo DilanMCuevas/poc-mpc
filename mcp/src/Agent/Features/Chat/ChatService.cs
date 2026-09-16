@@ -173,13 +173,14 @@ public sealed class ChatService : IChatService
                 var value = argument.Value.GetString()!;
                 values[argument.Name] = value.Length <= 128 ? value : "[valor demasiado largo]";
             }
-            else if (argument.Value.ValueKind == JsonValueKind.Number)
+            else if (argument.Value.ValueKind is JsonValueKind.Number or JsonValueKind.Null
+                or JsonValueKind.True or JsonValueKind.False)
             {
                 values[argument.Name] = argument.Value.Clone();
             }
             else
             {
-                values[argument.Name] = "[tipo inválido]";
+                values[argument.Name] = "[valor compuesto omitido]";
             }
         }
         return JsonSerializer.Serialize(values);
@@ -199,6 +200,10 @@ public sealed class ChatService : IChatService
                 Devuelve únicamente un objeto JSON con requiresTool, tool, arguments y response.
                 Si puedes ejecutar una herramienta: requiresTool=true, tool=nombre exacto,
                 arguments=objeto con todos sus required y response=null.
+                required indica qué propiedades deben existir. El schema de cada propiedad
+                determina los valores permitidos, incluso tipos múltiples y null.
+                Los parámetros opcionales no son obligatorios: omite los que el usuario
+                no proporcionó. No rellenes defaults ni campos null automáticamente.
                 Extrae los valores explícitos de la solicitud; conserva strings como strings
                 (incluidos ceros iniciales) y enteros como números JSON sin comillas.
                 No inventes valores, no uses valores de ejemplos del schema ni de otras personas.
