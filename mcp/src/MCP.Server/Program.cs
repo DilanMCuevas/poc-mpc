@@ -5,6 +5,7 @@ using MCP.Server.Features.ConsultarEstudiante;
 using MCP.Server.Shared.Database.MongoDb.Repositories;
 using MCP.Server.Features.ConsultarHistorial;
 using MCP.Server.Features.ConsultarExpediente;
+using MCP.Server.Features.ConsultarProfesor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddSingleton<MongoDbContext>();
 builder.Services.AddScoped<ConsultarEstudianteService>();
 builder.Services.AddScoped<ConsultarHistorialService>();
 builder.Services.AddScoped<ConsultarExpedienteService>();
+builder.Services.AddScoped<ConsultarProfesorService>();
 
 builder.Services
     .AddMcpServer()
@@ -28,7 +30,8 @@ builder.Services
     })
     .WithTools<ConsultarEstudianteTool>()
     .WithTools<ConsultarHistorialTool>()
-    .WithTools<ConsultarExpedienteTool>();
+    .WithTools<ConsultarExpedienteTool>()
+    .WithTools<ConsultarProfesorTool>();
     
 builder.Services.AddScoped<
     IHistorialAcademicoRepository,
