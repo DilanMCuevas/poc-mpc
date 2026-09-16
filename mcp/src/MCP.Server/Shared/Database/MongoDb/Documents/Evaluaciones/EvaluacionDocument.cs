@@ -24,6 +24,7 @@ public sealed class EvaluacionDocument
     public BsonDocument? Detalles { get; init; }
 
     [BsonElement("entregables")]
+    [BsonIgnoreIfNull]
     public BsonArray? Entregables { get; init; }
 
     [BsonExtraElements]

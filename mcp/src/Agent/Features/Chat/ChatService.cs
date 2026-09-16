@@ -204,7 +204,11 @@ public sealed class ChatService : IChatService
                 determina los valores permitidos, incluso tipos múltiples y null.
                 Los parámetros opcionales no son obligatorios: omite los que el usuario
                 no proporcionó. No rellenes defaults ni campos null automáticamente.
-                Extrae los valores explícitos de la solicitud; conserva strings como strings
+                Interpreta los datos expresados en lenguaje natural según las descripciones y
+                el schema: normaliza expresiones numéricas y construye objetos y listas cuando
+                corresponda. No exijas nombres técnicos de parámetros ni coincidencias literales
+                con su representación JSON. Esta interpretación no permite completar datos ausentes.
+                Conserva strings como strings
                 (incluidos ceros iniciales) y enteros como números JSON sin comillas.
                 No inventes valores, no uses valores de ejemplos del schema ni de otras personas.
                 No conviertas una boleta en un ID interno: son identificadores diferentes.
