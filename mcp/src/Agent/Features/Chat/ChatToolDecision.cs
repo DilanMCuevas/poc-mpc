@@ -1,7 +1,10 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace Agent.Features.Chat;
 
 public sealed record ChatToolDecision(
-    bool RequiresTool,
-    string? Tool,
-    IReadOnlyDictionary<string, object?> Arguments,
-    string? Response);
+    [property: JsonRequired] bool RequiresTool,
+    [property: JsonRequired] string? Tool,
+    [property: JsonRequired] JsonElement Arguments,
+    [property: JsonRequired] string? Response);

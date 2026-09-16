@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <PackageReference Include="ModelContextProtocol" Version="2.0.0" />
+    <Compile Remove="Tests/**/*.cs" />
+    <Content Remove="Tests/**" />
+    <None Remove="Tests/**" />
   </ItemGroup>
 
 </Project>

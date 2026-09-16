@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.Extensions.Options;
 
 namespace Agent.Integrations.Ollama;
@@ -16,15 +17,18 @@ public sealed class OllamaService : IOllamaService
         _options = options.Value;
     }
 
-   public async Task<string> ChatAsync(
+    public async Task<string> ChatAsync(
         IReadOnlyList<OllamaMessage> messages,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        JsonElement? responseFormat = null)
     {
         var request = new OllamaRequest
         {
             Model = _options.Model,
             Stream = false,
-            Messages = messages
+            Messages = messages,
+            Format = responseFormat,
+            Think = false
         };
 
         using var response = await _httpClient.PostAsJsonAsync(
@@ -38,7 +42,8 @@ public sealed class OllamaService : IOllamaService
             await response.Content.ReadFromJsonAsync<OllamaResponse>(
                 cancellationToken: cancellationToken);
 
-        if (ollamaResponse is null)
+        if (ollamaResponse?.Message is null
+            || string.IsNullOrWhiteSpace(ollamaResponse.Message.Content))
         {
             throw new InvalidOperationException(
                 "Ollama devolvió una respuesta vacía.");

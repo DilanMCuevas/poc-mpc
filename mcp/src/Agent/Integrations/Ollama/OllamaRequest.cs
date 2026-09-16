@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Agent.Integrations.Ollama;
@@ -13,6 +14,13 @@ public sealed class OllamaRequest
 
     [JsonPropertyName("stream")]
     public bool Stream { get; init; }
+
+    [JsonPropertyName("format")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public JsonElement? Format { get; init; }
+
+    [JsonPropertyName("think")]
+    public bool Think { get; init; }
 }
 
 public sealed class OllamaMessage

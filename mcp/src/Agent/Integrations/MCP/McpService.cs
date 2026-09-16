@@ -7,6 +7,7 @@ public sealed class McpService : IMcpService, IAsyncDisposable
 {
     private readonly McpOptions _options;
     private McpClient? _client;
+    private readonly SemaphoreSlim _clientLock = new(1, 1);
 
     public McpService(IOptions<McpOptions> options)
     {
@@ -24,7 +25,8 @@ public sealed class McpService : IMcpService, IAsyncDisposable
         return tools
             .Select(tool => new McpToolInfo(
                 tool.Name,
-                tool.Description))
+                tool.Description,
+                tool.ProtocolTool.InputSchema.Clone()))
             .ToList();
     }
     public async Task<string> CallToolAsync(
@@ -39,11 +41,19 @@ public sealed class McpService : IMcpService, IAsyncDisposable
             arguments,
             cancellationToken: cancellationToken);
 
-        return result.Content
+        if (result.IsError == true)
+        {
+            throw new InvalidOperationException("La herramienta MCP devolvió un error.");
+        }
+
+        if (result.StructuredContent is not null)
+        {
+            return result.StructuredContent.Value.GetRawText();
+        }
+
+        return string.Join(Environment.NewLine, result.Content
             .OfType<ModelContextProtocol.Protocol.TextContentBlock>()
-            .Select(content => content.Text)
-            .FirstOrDefault()
-            ?? string.Empty;
+            .Select(content => content.Text));
     }
 
     private async Task<McpClient> GetClientAsync(
@@ -54,19 +64,32 @@ public sealed class McpService : IMcpService, IAsyncDisposable
             return _client;
         }
 
-        var transportOptions = new HttpClientTransportOptions
+        await _clientLock.WaitAsync(cancellationToken);
+        try
         {
-            Name = "AcademicAgent",
-            Endpoint = new Uri(_options.ServerUrl)
-        };
+            if (_client is not null)
+            {
+                return _client;
+            }
 
-        var transport = new HttpClientTransport(transportOptions);
+            var transportOptions = new HttpClientTransportOptions
+            {
+                Name = "AcademicAgent",
+                Endpoint = new Uri(_options.ServerUrl)
+            };
 
-        _client = await McpClient.CreateAsync(
-            transport,
-            cancellationToken: cancellationToken);
+            var transport = new HttpClientTransport(transportOptions);
 
-        return _client;
+            _client = await McpClient.CreateAsync(
+                transport,
+                cancellationToken: cancellationToken);
+
+            return _client;
+        }
+        finally
+        {
+            _clientLock.Release();
+        }
     }
 
     public async ValueTask DisposeAsync()
