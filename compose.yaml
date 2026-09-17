@@ -97,6 +97,61 @@ services:
               capabilities:
                 - gpu
 
+  mcp-server:
+    build:
+      context: ./mcp
+      dockerfile: src/MCP.Server/Dockerfile
+    restart: unless-stopped
+
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5000
+      MySql__Server: mysql
+      MySql__Port: "3306"
+      MySql__Database: ${MYSQL_DATABASE}
+      MySql__User: ${MYSQL_USER}
+      MySql__Password: ${MYSQL_PASSWORD}
+      MongoDb__Server: mongodb
+      MongoDb__Port: "27017"
+      MongoDb__Database: ${MONGO_DATABASE}
+      MongoDb__User: ${MONGO_USER}
+      MongoDb__Password: ${MONGO_PASSWORD}
+      MongoDb__AuthenticationDatabase: ${MONGO_DATABASE}
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+
+    networks:
+      - mcp-network
+
+  agent:
+    build:
+      context: ./mcp
+      dockerfile: src/Agent/Dockerfile
+    restart: unless-stopped
+
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5000
+      Mcp__ServerUrl: http://mcp-server:5000/mcp
+      Ollama__BaseUrl: http://ollama:11434
+      Ollama__Model: qwen3:8b
+
+    ports:
+      - "5062:5000"
+
+    depends_on:
+      mcp-server:
+        condition: service_started
+      ollama:
+        condition: service_started
+
+    networks:
+      - mcp-network
+
 volumes:
 
   mysql_data:

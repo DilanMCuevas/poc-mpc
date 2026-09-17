@@ -1,0 +1,17 @@
+**/bin/
+**/obj/
+**/Tests/
+**/TestResults/
+**/.git/
+**/.vs/
+**/.idea/
+**/.env
+**/.env.*
+**/secrets.json
+**/*.pfx
+**/*.p12
+**/*.key
+**/*.user
+**/*.suo
+**/appsettings.Development.json
+**/Properties/launchSettings.json
