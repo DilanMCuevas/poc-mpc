@@ -6,6 +6,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+const string frontendCorsPolicy = "LocalViteFrontend";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(frontendCorsPolicy, policy =>
+        policy.WithOrigins("http://localhost:5173")
+            .WithMethods("POST")
+            .WithHeaders("Content-Type"));
+});
+
 builder.Services.Configure<McpOptions>(
     builder.Configuration.GetSection(McpOptions.SectionName));
 
@@ -28,6 +37,8 @@ builder.Services.AddHttpClient<IOllamaService, OllamaService>(
 builder.Services.AddScoped<IChatService, ChatService>();
 
 var app = builder.Build();
+
+app.UseCors(frontendCorsPolicy);
 
 app.MapGet("/", () => "Agent funcionando");
 

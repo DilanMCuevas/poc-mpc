@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, CalendarDays, CircleDot, Database, GraduationCap, MessageCircle, Network, Server, Sparkles, UserRound, UsersRound } from 'lucide-react'
+import { BarChart3, BookOpen, CalendarDays, Database, GraduationCap, MessageCircle, Network, Server, Sparkles, UserRound, UsersRound } from 'lucide-react'
 
 const navigation = [
   { label: 'Chat', icon: MessageCircle }, { label: 'Estudiantes', icon: UsersRound },
@@ -23,17 +23,12 @@ export function Sidebar({ onNavigate }: { onNavigate: () => void }) {
         className={`nav-item ${index === 0 ? 'active' : ''}`} disabled={index !== 0}
         title={index !== 0 ? `${label} · Próximamente` : 'Chat'}
         aria-current={index === 0 ? 'page' : undefined} onClick={onNavigate}>
-        <Icon size={23} /><span>{label}</span>{index !== 0 && <small>Pronto</small>}
+        <Icon size={23} /><span>{label}</span>
       </button>)}
     </nav>
-    <div className="system-panel">
-      <h3><CircleDot size={15} /> Sistema</h3>
-      <p>Servicios configurados</p>
-      <ul>{services.map(({ label, icon: Icon }) => <li key={label}><Icon size={15} /><span>{label}</span><span className="neutral-dot" /></li>)}</ul>
-      <small>Estado en vivo no disponible</small>
-    </div>
-    <footer className="sidebar-footer"><span className="workspace-icon"><GraduationCap size={22} /></span>
-      <span><strong>Espacio académico</strong><small>Asistente de datos</small></span>
-    </footer>
+    <details className="system-panel">
+      <summary>Sistema</summary>
+      <ul>{services.map(({ label, icon: Icon }) => <li key={label}><Icon size={15} /><span>{label}</span></li>)}</ul>
+    </details>
   </aside>
 }

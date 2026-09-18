@@ -1,17 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { LayoutGrid, Menu, Search, X } from 'lucide-react'
+import { LayoutGrid, Menu, X } from 'lucide-react'
 import { Sidebar } from './components/Sidebar'
 import { Chat } from './components/Chat'
 import { ToolsPanel } from './components/ToolsPanel'
 import { Examples } from './components/Examples'
 import { sendMessage } from './lib/api'
 import type { Message } from './types'
-
-function Clock() {
-  const [now, setNow] = useState(() => new Date())
-  useEffect(() => { const timer = window.setInterval(() => setNow(new Date()), 1000 * 30); return () => window.clearInterval(timer) }, [])
-  return <div className="clock"><span>{now.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span><time dateTime={now.toISOString()}>{now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false })}</time></div>
-}
 
 export default function App() {
   const [messages, setMessages] = useState<Message[]>([])
@@ -73,10 +67,10 @@ export default function App() {
   return <div className="app-layout">
     <div className="desktop-sidebar"><Sidebar onNavigate={() => inputRef.current?.focus()} /></div>
     <main className="workspace">
-      <div className="topbar"><button className="icon-button mobile-nav" aria-label="Abrir navegación" onClick={() => setDrawer('navigation')}><Menu size={21} /></button><button className="command-bar" onClick={() => inputRef.current?.focus()}><Search size={19} /><span>¿Qué necesitas consultar hoy?</span><kbd>Ctrl K</kbd></button><button className="icon-button tools-toggle" aria-label="Abrir herramientas y ejemplos" onClick={() => setDrawer('tools')}><LayoutGrid size={21} /></button><Clock /></div>
+      <div className="topbar"><button className="icon-button mobile-nav" aria-label="Abrir navegación" onClick={() => setDrawer('navigation')}><Menu size={21} /></button><button className="icon-button tools-toggle" aria-label="Abrir herramientas y ejemplos" onClick={() => setDrawer('tools')}><LayoutGrid size={21} /></button></div>
       <div className="workspace-grid">
-        <header className="hero"><div className="eyebrow">AGENTE IA <span>·</span> MCP</div><h1>Tu asistente <span>académico,</span><br className="hero-break" /> potenciado por IA.</h1><p>Consulta información, analiza datos y ejecuta operaciones en lenguaje natural.</p></header>
-        <div className="brand-quote"><p>“Datos conectados.<br />Decisiones más inteligentes.”</p><span /></div>
+        <header className="hero"><div className="eyebrow">AGENTE IA <span>·</span> MCP</div><h1>Tu asistente <span>académico,</span><br className="hero-break" /> potenciado por IA.</h1></header>
+
         <Chat messages={messages} pending={pending} draft={draft} onDraft={setDraft} onSend={submit} onReset={reset} inputRef={inputRef} />
         <aside className="right-panel" aria-label="Herramientas y ejemplos"><ToolsPanel /><Examples onSelect={chooseExample} disabled={pending} /></aside>
       </div>
