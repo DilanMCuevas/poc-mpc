@@ -152,6 +152,22 @@ services:
     networks:
       - mcp-network
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+
+    ports:
+      - "8080:80"
+
+    depends_on:
+      agent:
+        condition: service_started
+
+    networks:
+      - mcp-network
+
 volumes:
 
   mysql_data:
